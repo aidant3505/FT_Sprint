@@ -102,6 +102,25 @@ void AFT_SprintCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 }
 
+void AFT_SprintCharacter::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
+	if (IsSprinting && CurrentStamina > 0)
+	{
+		CurrentStamina--;
+	}
+	if (!IsSprinting && CurrentStamina < MaxStamina)
+	{
+		CurrentStamina++;
+	}
+	if (CurrentStamina <= 0 && IsSprinting)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed / 2;
+		GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed / 3;
+		IsSprinting = false;
+	}
+}
+
 void AFT_SprintCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -141,15 +160,24 @@ void AFT_SprintCharacter::Look(const FInputActionValue& Value)
 /** Connah methods implementation */
 void AFT_SprintCharacter::SprintStart(const FInputActionValue& Value)
 {
-	// we could set speeds, but i like scalers 
-	GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2;
-	// make it so they have a speed up route
-	GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed * 3;
+	if (CurrentStamina > 50)
+	{
+		// we could set speeds, but i like scalers 
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2;
+		// make it so they have a speed up route
+		GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed * 3;
+		IsSprinting = true;
+	}
+	
 }
 
 void AFT_SprintCharacter::SprintStop(const FInputActionValue& Value)
 {
-	// Reset the speeds
-	GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed / 2;
-	GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed / 3;
+	if (IsSprinting == true)
+	{
+		// Reset the speeds
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed / 2;
+		GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed / 3;
+		IsSprinting = false;
+	}
 }
