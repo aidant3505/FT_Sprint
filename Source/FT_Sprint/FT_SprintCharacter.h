@@ -54,6 +54,9 @@ class AFT_SprintCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stamina, meta = (AllowPrivateAccess = "true"))
 	float CurrentStamina;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stamina, meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed = 200;
+
 	bool IsSprinting;
 
 public:

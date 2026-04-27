@@ -13,14 +13,6 @@
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
-//////////////////////////////////////////////////////////////////////////
-// AFT_SprintCharacter
-// Tasks: 
-// 1. Create a variable for stamina and a boolean to track when to drain stamina
-// 2. Drain stamina while sprinting is enabled & when the player jumps
-// 3. Disable or restrict movement if stamina is fully drained
-// 4. Recover stamina when the character is not sprinting
-
 AFT_SprintCharacter::AFT_SprintCharacter()
 {
 	// Set size for collision capsule
@@ -39,7 +31,7 @@ AFT_SprintCharacter::AFT_SprintCharacter()
 	// instead of recompiling to adjust them
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -54,9 +46,6 @@ AFT_SprintCharacter::AFT_SprintCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
 void AFT_SprintCharacter::BeginPlay()
@@ -65,8 +54,6 @@ void AFT_SprintCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
 
 void AFT_SprintCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -163,7 +150,7 @@ void AFT_SprintCharacter::SprintStart(const FInputActionValue& Value)
 	if (CurrentStamina > 50)
 	{
 		// we could set speeds, but i like scalers 
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2;
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 3;
 		// make it so they have a speed up route
 		GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed * 3;
 		IsSprinting = true;
@@ -176,7 +163,7 @@ void AFT_SprintCharacter::SprintStop(const FInputActionValue& Value)
 	if (IsSprinting == true)
 	{
 		// Reset the speeds
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed / 2;
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed / 3;
 		GetCharacterMovement()->MinAnalogWalkSpeed = GetCharacterMovement()->MinAnalogWalkSpeed / 3;
 		IsSprinting = false;
 	}
